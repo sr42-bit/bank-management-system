@@ -1,77 +1,67 @@
+//package declaration
 package com.backend_java.Vijay_Mallay.domain.model;
-// Local import
+
+//local import 
 import com.backend_java.Vijay_Mallay.domain.enums.Gender;
 
-// Jakarta persistence
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Transient;
-
-// Lombok
-import lombok.Setter;
+//lombok imports
 import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-// Validation 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
-// Java time
+// java time imports
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 
-@Entity
-@Table(name = "customer")
-@Setter
+// java util imports
+import java.util.UUID;
+
+
+// POJO CLASS — core business model
+
 @Getter
+@Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer {
 
-    @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long customerId;
+    // Unique business ID (like CUST-UUID)
+    private String customerId;
 
-    @Column(name = "name", nullable = false, length = 50)
-    @NotBlank(message = "Name is mandatory")
-    private String name;
-
-    @Transient // Calculated from DOB, not stored in DB
-    private Long age;
-
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "Gender is mandatory")
+    private String fullName;
     private Gender gender;
-
-    @Column(unique = true, nullable = false)
-    @Email(message = "Invalid email")
-    @NotBlank(message = "Email is mandatory")
+    private LocalDate dateOfBirth;
     private String email;
+    private String phoneNumber;
+    private String panNumber;
+    private String aadharNumber;
+    private boolean kycVerified;
 
-    @Column(unique = true, nullable = false, length = 15)
-    @NotBlank(message = "Phone number is mandatory")
-    @Size(max = 15, message = "Phone number must be at most 15 characters")
-    private String phoneNo;
+    // Address fields
+    private String addressLine1;
+    private String addressLine2;
+    private String city;
+    private String state;
+    private String postalCode;
+    private String country;
 
-    @Column(length = 255)
-    private String address;
+    // Active status
+    private boolean active;
+    private LocalDateTime createdDate;
+    private LocalDateTime lastUpdated;
 
-    @Column(nullable = false)
-    @NotNull(message = "Date of Birth is mandatory")
-    private LocalDate dob;
-
-    @Transient
+    /** Calculates age dynamically based on dateOfBirth */
     public Integer getAge() {
-        if (dob == null) return null;
-        return Period.between(dob, LocalDate.now()).getYears();
+        if (dateOfBirth == null) return null;
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
+    }
+
+    /** Domain utility: generate a custom ID like CUST-UUID */
+    public static String generateCustomerId() {
+        return "BOB-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }
