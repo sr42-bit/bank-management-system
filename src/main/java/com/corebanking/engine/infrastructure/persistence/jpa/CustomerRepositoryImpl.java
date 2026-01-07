@@ -22,12 +22,19 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
     @Override
     public void save(Customer customer) {
-        jpaRepo.save(mapper.toEntity(customer));
+        CustomerJpaEntity entity = mapper.toEntity(customer);
+        if (entity != null) {
+            jpaRepo.save(entity);
+        }
     }
 
     @Override
     public Customer load(CustomerId id) {
-        return jpaRepo.findById(id.value())
+        String idValue = id.value();
+        if (idValue == null) {
+            throw new CustomerNotFoundException(id);
+        }
+        return jpaRepo.findById(idValue)
                 .map(mapper::toDomain)
                 .orElseThrow(() -> new CustomerNotFoundException(id));
     }

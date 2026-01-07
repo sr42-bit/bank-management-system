@@ -4,7 +4,9 @@ import com.corebanking.engine.domain.model.aggregate.Customer;
 import com.corebanking.engine.domain.model.valueobject.*;
 
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CustomerJpaMapper {
 
     public CustomerJpaEntity toEntity(Customer c) {

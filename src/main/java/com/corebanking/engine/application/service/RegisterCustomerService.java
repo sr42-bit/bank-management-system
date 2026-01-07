@@ -29,7 +29,7 @@ public final class RegisterCustomerService implements RegisterCustomerUseCase {
         if (customerRepository.existsByEmail(email))
             throw new IllegalStateException("Customer with email already exists");
 
-        CustomerId customerId = CustomerId.of(customerIdGenerator.generate());
+        CustomerId customerId = customerIdGenerator.generate();
 
         Customer customer = Customer.register(
                 customerId,
