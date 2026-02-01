@@ -1,43 +1,49 @@
 package com.corebanking.engine.application.service;
 
-import com.corebanking.engine.application.port.in.*;
-import com.corebanking.engine.application.port.out.*;
+import com.corebanking.engine.application.port.in.command.RegisterCustomerCommand;
+import com.corebanking.engine.application.port.in.result.RegisterCustomerResult;
+import com.corebanking.engine.application.port.in.usecase.RegisterCustomerUseCase;
+import com.corebanking.engine.application.port.out.customer.CustomerIdGenerator;
+import com.corebanking.engine.application.port.out.customer.CustomerRepository;
 import com.corebanking.engine.domain.model.aggregate.Customer;
-import com.corebanking.engine.domain.model.valueobject.*;
-
+import com.corebanking.engine.domain.model.valueobject.CustomerId;
+import com.corebanking.engine.domain.model.valueobject.EmailAddress;
+import com.corebanking.engine.domain.model.valueobject.FullName;
+import com.corebanking.engine.domain.model.valueobject.PhoneNo;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 
-public final class RegisterCustomerService implements RegisterCustomerUseCase {
+@Service
+@Transactional
+public class RegisterCustomerService implements RegisterCustomerUseCase {
 
     private final CustomerRepository customerRepository;
     private final CustomerIdGenerator customerIdGenerator;
     private final Clock clock;
 
-    public RegisterCustomerService(CustomerRepository customerRepository,
-                                   CustomerIdGenerator customerIdGenerator,
-                                   Clock clock) {
+    public RegisterCustomerService(
+            CustomerRepository customerRepository,
+            CustomerIdGenerator customerIdGenerator,
+            Clock clock) {
+
         this.customerRepository = customerRepository;
         this.customerIdGenerator = customerIdGenerator;
         this.clock = clock;
     }
 
     @Override
-    public RegisterCustomerResult register(RegisterCustomerCommand cmd) {
-
-        EmailAddress email = EmailAddress.of(cmd.email());
-
-        if (customerRepository.existsByEmail(email))
-            throw new IllegalStateException("Customer with email already exists");
+    public RegisterCustomerResult registerCustomer(RegisterCustomerCommand command) {
 
         CustomerId customerId = customerIdGenerator.generate();
 
         Customer customer = Customer.register(
                 customerId,
-                FullName.of(cmd.firstName(), cmd.lastName()),
-                email,
-                PhoneNo.of(cmd.phone()),
-                cmd.gender(),
-                cmd.dob(),
+                FullName.of(command.firstName(), command.lastName()),
+                EmailAddress.of(command.email()),
+                PhoneNo.of(command.phone()),
+                command.gender(),
+                command.dob(),
                 clock
         );
 

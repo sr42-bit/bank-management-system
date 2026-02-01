@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: corebank-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bank_clean_architecture
+      MYSQL_USER: bankuser
+      MYSQL_PASSWORD: bankpass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - corebank-net
+
+  backend:
+    build: .
+    container_name: corebank-backend
+    depends_on:
+      - mysql
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - corebank-net
+
+volumes:
+  mysql_data:
+
+networks:
+  corebank-net:

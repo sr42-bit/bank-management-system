@@ -1,45 +1,46 @@
 package com.corebanking.engine.infrastructure.web.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.corebanking.engine.application.port.in.*;
+import com.corebanking.engine.application.port.in.command.RegisterCustomerCommand;
+import com.corebanking.engine.application.port.in.result.RegisterCustomerResult;
+import com.corebanking.engine.application.port.in.usecase.RegisterCustomerUseCase;
 import com.corebanking.engine.infrastructure.web.dto.RegisterCustomerRequest;
+import org.springframework.web.bind.annotation.RequestBody;
 
-@RestController
+ @RestController
 @RequestMapping("/customers")
 public class CustomerController {
 
-    private final RegisterCustomerUseCase registerUseCase;
-    private final VerifyKycUseCase verifyKycUseCase;
+    private final RegisterCustomerUseCase registerCustomerUseCase;
 
-    public CustomerController(RegisterCustomerUseCase registerUseCase,
-                              VerifyKycUseCase verifyKycUseCase) {
-        this.registerUseCase = registerUseCase;
-        this.verifyKycUseCase = verifyKycUseCase;
+    public CustomerController(RegisterCustomerUseCase registerCustomerUseCase) {
+        this.registerCustomerUseCase = registerCustomerUseCase;
     }
 
     @PostMapping
-    public ResponseEntity<RegisterCustomerResult> register(
-            @RequestBody RegisterCustomerRequest r) {
+    public ResponseEntity<RegisterCustomerResult> registerCustomer(
+            @RequestBody RegisterCustomerRequest request) {
 
-        RegisterCustomerCommand cmd = new RegisterCustomerCommand(
-                r.firstName(),
-                r.lastName(),
-                r.email(),
-                r.phone(),
-                r.gender(),
-                r.dob()
-        );
+        // Map Web DTO → Application Command
+        RegisterCustomerCommand command =
+                new RegisterCustomerCommand(
+                        request.firstName(),
+                        request.lastName(),
+                        request.email(),
+                        request.phone(),
+                        request.gender(),
+                        request.dob()
+                );
 
-        RegisterCustomerResult result = registerUseCase.register(cmd);
+        RegisterCustomerResult result =
+                registerCustomerUseCase.registerCustomer(command);
+
         return ResponseEntity.ok(result);
     }
-
-    @PutMapping("/{id}/kyc")
-    public ResponseEntity<Void> verifyKyc(@PathVariable String id) {
-
-        verifyKycUseCase.verifyKyc(new VerifyKycCommand(id));
-        return ResponseEntity.ok().build();
-    }
 }
+
+
