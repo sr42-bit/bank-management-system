@@ -1,5 +1,6 @@
 package com.corebanking.engine.domain.model.valueobject;
 
+import com.corebanking.engine.domain.model.exception.DomainValidationException;
 import java.util.Objects;
 
 public final class FullName {
@@ -10,10 +11,10 @@ public final class FullName {
     private FullName(String firstName, String lastName) {
 
         if (firstName == null || firstName.isBlank())
-            throw new IllegalArgumentException("First name cannot be empty");
+            throw new DomainValidationException("First name cannot be empty");
 
         if (lastName == null || lastName.isBlank())
-            throw new IllegalArgumentException("Last name cannot be empty");
+            throw new DomainValidationException("Last name cannot be empty");
 
         String f = firstName.trim();
         String l = lastName.trim();
@@ -38,6 +39,9 @@ public final class FullName {
 
     @Override
     public String toString() {
+        return firstName + " " + lastName;
+    }
+    public String value() {
         return firstName + " " + lastName;
     }
 

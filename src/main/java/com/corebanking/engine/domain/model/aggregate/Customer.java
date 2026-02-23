@@ -58,6 +58,17 @@ public final class Customer {
                      KycDocument kycDocument, List<AccountId> accounts,
                      LocalDateTime createdAt, LocalDateTime updatedAt) {
 
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(email);
+        Objects.requireNonNull(phone);
+        Objects.requireNonNull(gender);
+        Objects.requireNonNull(dob);
+        Objects.requireNonNull(status);
+        Objects.requireNonNull(kycStatus);
+        Objects.requireNonNull(createdAt);
+        Objects.requireNonNull(updatedAt);
+
         this.id = id;
         this.name = name;
         this.email = email;
@@ -69,7 +80,11 @@ public final class Customer {
         this.kycDocument = kycDocument;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.linkedAccounts.addAll(accounts);
+
+        // ✅ SAFE: never crash on null
+        if (accounts != null) {
+            this.linkedAccounts.addAll(accounts);
+        }
     }
 
     // ================== FACTORIES ==================
@@ -79,23 +94,18 @@ public final class Customer {
 
         return new Customer(id, name, email, phone, gender, dob, clock);
     }
+
     public static Customer rehydrate(CustomerId id, FullName name, EmailAddress email,
-        PhoneNo phone, Gender gender, LocalDate dob,
-        CustomerStatus status, KycStatus kycStatus,
-        KycDocument kycDocument, List<AccountId> accounts,
-        LocalDateTime createdAt, LocalDateTime updatedAt) {
+                                     PhoneNo phone, Gender gender, LocalDate dob,
+                                     CustomerStatus status, KycStatus kycStatus,
+                                     KycDocument kycDocument, List<AccountId> accounts,
+                                     LocalDateTime createdAt, LocalDateTime updatedAt) {
+
         return new Customer(id, name, email, phone, gender, dob,
-            status, kycStatus, kycDocument, accounts,
-            createdAt, updatedAt);
+                status, kycStatus, kycDocument,
+                accounts, createdAt, updatedAt);
     }
 
-    // ================== CLOSURE ==================
- 
-    // ================== INVARIANTS ==================
-
-
-    // ================== EVENTS ==================
-   
     // ================== SAFE GETTERS ==================
     public CustomerId id() { return id; }
     public FullName name() { return name; }
@@ -106,7 +116,10 @@ public final class Customer {
     public CustomerStatus status() { return status; }
     public KycStatus kycStatus() { return kycStatus; }
     public LocalDateTime updatedAt() { return updatedAt; }
-    public List<AccountId> linkedAccounts() { return List.copyOf(linkedAccounts); }
-    public LocalDateTime createdAt() {return createdAt;}
-    public KycDocument kycDocument() {return kycDocument;}
+    public LocalDateTime createdAt() { return createdAt; }
+    public KycDocument kycDocument() { return kycDocument; }
+
+    public List<AccountId> linkedAccounts() {
+        return List.copyOf(linkedAccounts);
+    }
 }

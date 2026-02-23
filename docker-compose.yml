@@ -10,6 +10,8 @@ services:
       MYSQL_DATABASE: bank_clean_architecture
       MYSQL_USER: bankuser
       MYSQL_PASSWORD: bankpass
+    ports:
+      - "3307:3306"   # Host 3307 → Container 3306
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
