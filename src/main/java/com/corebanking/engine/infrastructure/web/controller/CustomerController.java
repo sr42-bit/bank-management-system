@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.corebanking.engine.application.port.in.command.RegisterCustomerCommand;
+import com.corebanking.engine.application.port.in.result.InfoCustomerResult;
 import com.corebanking.engine.application.port.in.result.RegisterCustomerResult;
 import com.corebanking.engine.application.port.in.usecase.RegisterCustomerUseCase;
 import com.corebanking.engine.application.port.in.usecase.InfoCustomerUseCase;
@@ -11,16 +12,10 @@ import com.corebanking.engine.infrastructure.web.dto.request.RegisterCustomerReq
 import com.corebanking.engine.infrastructure.web.dto.response.InfoCustomerResponse;
 import com.corebanking.engine.infrastructure.web.dto.response.RegisterCustomerResponse;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
-        @PostConstruct
-public void init() {
-    System.out.println("🔥 CustomerController loaded!");
-}
 
     private final RegisterCustomerUseCase registerCustomerUseCase;
     private final InfoCustomerUseCase infoCustomerUseCase;
@@ -55,7 +50,19 @@ public void init() {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<InfoCustomerResponse> getCustomer(@PathVariable String id) {
-        return ResponseEntity.ok(infoCustomerUseCase.getCustomerById(id));
-    }
+public ResponseEntity<InfoCustomerResponse> getCustomer(@PathVariable String id) {
+    InfoCustomerResult result = infoCustomerUseCase.getCustomerById(id);
+
+    InfoCustomerResponse response = new InfoCustomerResponse(
+            result.name(),
+            result.email(),
+            result.phone(),
+            result.gender(),
+            result.dob(),
+            result.status(),
+            result.kycStatus()
+    );
+
+    return ResponseEntity.ok(response);
+}
 }

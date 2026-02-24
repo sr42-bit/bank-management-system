@@ -36,8 +36,9 @@ public final class Customer {
         Objects.requireNonNull(dob);
         Objects.requireNonNull(clock);
 
-        if (Period.between(dob, LocalDate.now(clock)).getYears() < 18)
+        if (Period.between(dob, LocalDate.now(clock)).getYears() < 18) {
             throw new IllegalArgumentException("Customer must be at least 18 years old");
+        }
 
         this.id = id;
         this.name = name;
@@ -81,7 +82,6 @@ public final class Customer {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
 
-        // ✅ SAFE: never crash on null
         if (accounts != null) {
             this.linkedAccounts.addAll(accounts);
         }
@@ -106,7 +106,7 @@ public final class Customer {
                 accounts, createdAt, updatedAt);
     }
 
-    // ================== SAFE GETTERS ==================
+    // ================== GETTERS ==================
     public CustomerId id() { return id; }
     public FullName name() { return name; }
     public EmailAddress email() { return email; }

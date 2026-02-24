@@ -8,12 +8,11 @@ import com.corebanking.engine.domain.model.valueobject.EmailAddress;
 import com.corebanking.engine.domain.model.valueobject.FullName;
 import com.corebanking.engine.domain.model.valueobject.PhoneNo;
 import com.corebanking.engine.infrastructure.persistence.jpa.entity.CustomerJpaEntity;
-import com.corebanking.engine.infrastructure.web.dto.response.InfoCustomerResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomerEntityMapper {
+public class CustomerJpaMapper {
 
     public @NonNull CustomerJpaEntity toEntity(Customer customer) {
         return new CustomerJpaEntity(
@@ -55,24 +54,12 @@ public class CustomerEntityMapper {
                 PhoneNo.of(entity.getPhone()),
                 entity.getGender(),
                 entity.getDob(),
-                safeStatus(entity.getStatus()),        // 👈 FIX
-                safeKycStatus(entity.getKycStatus()), // 👈 FIX
+                safeStatus(entity.getStatus()),
+                safeKycStatus(entity.getKycStatus()),
                 null,
                 null,
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
-        );
-    }
-
-    public InfoCustomerResponse toResponse(Customer customer) {
-        return new InfoCustomerResponse(
-                customer.name() != null ? customer.name().toString() : null,
-                customer.email() != null ? customer.email().value() : null,
-                customer.phone() != null ? customer.phone().value() : null,
-                customer.gender() != null ? customer.gender().name() : null,
-                customer.dob() != null ? customer.dob().toString() : null,
-                customer.status() != null ? customer.status().name() : null,
-                customer.kycStatus() != null ? customer.kycStatus().name() : null
         );
     }
 }

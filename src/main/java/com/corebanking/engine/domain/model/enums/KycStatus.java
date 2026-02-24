@@ -10,6 +10,7 @@ public enum KycStatus {
     PENDING_REVIEW {
         @Override
         public boolean canVerify() { return true; }
+
         @Override
         public boolean canReject() { return true; }
     },
@@ -21,8 +22,8 @@ public enum KycStatus {
         public boolean canResubmit() { return true; }
     };
 
-    public boolean canSubmit()  { return false; }
-    public boolean canVerify()  { return false; }
-    public boolean canReject()  { return false; }
-    public boolean canResubmit(){ return false; }
+    public boolean canSubmit()   { return false; }
+    public boolean canVerify()   { return false; }
+    public boolean canReject()   { return false; }
+    public boolean canResubmit() { return false; }
 }

@@ -1,22 +1,23 @@
 package com.corebanking.engine.domain.model.valueobject;
 
+import com.corebanking.engine.domain.model.exception.DomainValidationException;
 import java.util.Objects;
 
 public final class EmailAddress {
 
     private static final String EMAIL_REGEX =
-            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
     private final String value;
 
     private EmailAddress(String value) {
         if (value == null || value.isBlank())
-            throw new IllegalArgumentException("Email cannot be empty");
+            throw new DomainValidationException("Email cannot be empty");
 
         String normalized = value.trim().toLowerCase();
 
         if (!normalized.matches(EMAIL_REGEX))
-            throw new IllegalArgumentException("Invalid email format");
+            throw new DomainValidationException("Invalid email format");
 
         this.value = normalized;
     }

@@ -18,6 +18,10 @@ public enum Gender {
     }
 
     public static Gender fromCode(String code) {
+        if (code == null || code.isBlank()) {
+            return UNSPECIFIED;
+        }
+
         for (Gender g : values()) {
             if (g.regulatoryCode.equalsIgnoreCase(code)) {
                 return g;

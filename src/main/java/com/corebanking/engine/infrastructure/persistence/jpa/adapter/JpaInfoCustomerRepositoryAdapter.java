@@ -6,27 +6,27 @@ import org.springframework.stereotype.Component;
 
 import com.corebanking.engine.application.port.out.customer.InfoCustomerPort;
 import com.corebanking.engine.domain.model.aggregate.Customer;
+import com.corebanking.engine.domain.model.valueobject.CustomerId;
 import com.corebanking.engine.infrastructure.persistence.jpa.repository.SpringCustomerJpaRepository;
-import com.corebanking.engine.infrastructure.persistence.mapper.CustomerEntityMapper;
+import com.corebanking.engine.infrastructure.persistence.mapper.CustomerJpaMapper;
 
 @Component
 public class JpaInfoCustomerRepositoryAdapter implements InfoCustomerPort {
 
     private final SpringCustomerJpaRepository customerJpaRepository;
-    private final CustomerEntityMapper mapper;
+    private final CustomerJpaMapper mapper;
 
-    public JpaInfoCustomerRepositoryAdapter(SpringCustomerJpaRepository customerJpaRepository,
-                                           CustomerEntityMapper mapper) {
+    public JpaInfoCustomerRepositoryAdapter(
+            SpringCustomerJpaRepository customerJpaRepository,
+            CustomerJpaMapper mapper) {
         this.customerJpaRepository = customerJpaRepository;
         this.mapper = mapper;
     }
 
+    @SuppressWarnings("null")
     @Override
-    public Optional<Customer> loadById(String customerId) {
-        if (customerId == null) {
-            return Optional.empty();
-        }
-        return customerJpaRepository.findById(customerId)
+    public Optional<Customer> loadById(CustomerId customerId) {
+        return customerJpaRepository.findById(customerId.value())
                 .map(mapper::toDomain);
     }
 }

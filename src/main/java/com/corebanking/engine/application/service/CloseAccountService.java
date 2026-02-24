@@ -8,7 +8,9 @@ import com.corebanking.engine.domain.model.aggregate.Account;
 import com.corebanking.engine.domain.model.valueobject.AccountId;
 
 import java.time.Clock;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CloseAccountService implements CloseAccountUseCase {
 
     private final AccountRepository accountRepository;

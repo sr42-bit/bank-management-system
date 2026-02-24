@@ -1,5 +1,6 @@
 package com.corebanking.engine.domain.model.valueobject;
 
+import com.corebanking.engine.domain.model.exception.DomainValidationException;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -8,7 +9,13 @@ public final class DomainTime {
     private final Instant value;
 
     private DomainTime(Instant value) {
-        this.value = Objects.requireNonNull(value);
+        if (value == null)
+            throw new DomainValidationException("DomainTime cannot be null");
+        this.value = value;
+    }
+
+    public static DomainTime now() {
+        return new DomainTime(Instant.now());
     }
 
     public static DomainTime of(Instant instant) {

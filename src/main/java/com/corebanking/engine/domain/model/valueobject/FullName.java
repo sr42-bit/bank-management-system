@@ -20,7 +20,7 @@ public final class FullName {
         String l = lastName.trim();
 
         if (f.length() > 50 || l.length() > 50)
-            throw new IllegalArgumentException("Name length exceeds limit");
+            throw new DomainValidationException("Name length exceeds limit");
 
         this.firstName = capitalize(f);
         this.lastName  = capitalize(l);
@@ -31,18 +31,20 @@ public final class FullName {
     }
 
     private static String capitalize(String value) {
+        if (value.length() == 1) return value.toUpperCase();
         return value.substring(0,1).toUpperCase() + value.substring(1).toLowerCase();
     }
 
     public String firstName() { return firstName; }
     public String lastName()  { return lastName; }
 
-    @Override
-    public String toString() {
-        return firstName + " " + lastName;
-    }
     public String value() {
         return firstName + " " + lastName;
+    }
+
+    @Override
+    public String toString() {
+        return value();
     }
 
     @Override

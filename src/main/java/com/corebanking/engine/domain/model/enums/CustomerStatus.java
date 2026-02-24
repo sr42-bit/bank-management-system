@@ -4,44 +4,18 @@ public enum CustomerStatus {
 
     ACTIVE {
         @Override
-        public boolean canClose() {
-            return true;
-        }
+        public boolean canSuspend() { return true; }
 
         @Override
-        public boolean canSuspend() {
-            return true;
-        }
+        public boolean canClose() { return true; }
     },
 
     SUSPENDED {
         @Override
-        public boolean canActivate() {
-            return true;
-        }
-
-        @Override
-        public boolean canClose() {
-            return false;
-        }
+        public boolean canActivate() { return true; }
     },
 
-    INACTIVE {
-        @Override
-        public boolean canActivate() {
-            return false;
-        }
-
-        @Override
-        public boolean canClose() {
-            return false;
-        }
-
-        @Override
-        public boolean canSuspend() {
-            return false;
-        }
-    };
+    INACTIVE;
 
     public boolean canActivate() { return false; }
     public boolean canSuspend() { return false; }

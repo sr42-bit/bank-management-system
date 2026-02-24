@@ -1,5 +1,6 @@
 package com.corebanking.engine.domain.model.valueobject;
 
+import com.corebanking.engine.domain.model.exception.DomainValidationException;
 import java.util.Objects;
 
 public final class PhoneNo {
@@ -11,12 +12,12 @@ public final class PhoneNo {
     private PhoneNo(String value) {
 
         if (value == null || value.isBlank())
-            throw new IllegalArgumentException("Phone number cannot be empty");
+            throw new DomainValidationException("Phone number cannot be empty");
 
         String normalized = value.trim();
 
         if (!normalized.matches(E164_REGEX))
-            throw new IllegalArgumentException("Phone number must be in E.164 format (e.g. +919876543210)");
+            throw new DomainValidationException("Phone number must be in E.164 format (e.g. +919876543210)");
 
         this.value = normalized;
     }

@@ -1,7 +1,7 @@
 package com.corebanking.engine.application.port.in.usecase;
 
-import com.corebanking.engine.infrastructure.web.dto.response.InfoCustomerResponse;
+import com.corebanking.engine.application.port.in.result.InfoCustomerResult;
 
 public interface InfoCustomerUseCase {
-    InfoCustomerResponse getCustomerById(String customerId);    
+    InfoCustomerResult getCustomerById(String customerId);    
 }

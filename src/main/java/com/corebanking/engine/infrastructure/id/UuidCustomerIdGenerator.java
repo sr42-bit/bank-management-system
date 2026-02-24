@@ -11,6 +11,6 @@ public class UuidCustomerIdGenerator implements CustomerIdGenerator {
 
     @Override
     public CustomerId generate() {
-        return CustomerId.of("CUST-" + UUID.randomUUID());
+        return CustomerId.of("CUST-" + UUID.randomUUID().toString());
     }
 }
