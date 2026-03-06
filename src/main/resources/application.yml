@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3307/bank_clean_architecture?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: ${SPRING_DATASOURCE_URL}
     username: bankuser
     password: bankpass
     driver-class-name: com.mysql.cj.jdbc.Driver
