@@ -9,11 +9,12 @@ import java.util.*;
 public final class Customer {
 
     private final CustomerId id;
-    private final FullName name;
-    private final EmailAddress email;
-    private final PhoneNo phone;
-    private final LocalDate dob;
-    private final Gender gender;
+
+    private FullName name;
+    private EmailAddress email;
+    private PhoneNo phone;
+    private LocalDate dob;
+    private Gender gender;
 
     private CustomerStatus status;
     private KycStatus kycStatus;
@@ -46,8 +47,10 @@ public final class Customer {
         this.phone = phone;
         this.gender = gender;
         this.dob = dob;
+
         this.status = CustomerStatus.ACTIVE;
         this.kycStatus = KycStatus.NOT_STARTED;
+
         this.createdAt = LocalDateTime.now(clock);
         this.updatedAt = this.createdAt;
     }
@@ -76,9 +79,11 @@ public final class Customer {
         this.phone = phone;
         this.gender = gender;
         this.dob = dob;
+
         this.status = status;
         this.kycStatus = kycStatus;
         this.kycDocument = kycDocument;
+
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
 
@@ -87,7 +92,7 @@ public final class Customer {
         }
     }
 
-    // ================== FACTORIES ==================
+    // ================== FACTORY METHODS ==================
     public static Customer register(CustomerId id, FullName name, EmailAddress email,
                                     PhoneNo phone, Gender gender,
                                     LocalDate dob, Clock clock) {
@@ -106,17 +111,68 @@ public final class Customer {
                 accounts, createdAt, updatedAt);
     }
 
+    // ================== UPDATE DETAILS ==================
+    public void updateDetails(
+            FullName name,
+            EmailAddress email,
+            PhoneNo phone,
+            Gender gender,
+            LocalDate dob,
+            Clock clock
+    ) {
+
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(email);
+        Objects.requireNonNull(phone);
+        Objects.requireNonNull(gender);
+        Objects.requireNonNull(dob);
+
+        if (Period.between(dob, LocalDate.now(clock)).getYears() < 18) {
+            throw new IllegalArgumentException("Customer must be at least 18 years old");
+        }
+
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.gender = gender;
+        this.dob = dob;
+
+        this.updatedAt = LocalDateTime.now(clock);
+    }
+
+    // ================== ACCOUNT LINKING ==================
+    public void linkAccount(AccountId accountId) {
+
+        Objects.requireNonNull(accountId);
+
+        if (!linkedAccounts.contains(accountId)) {
+            linkedAccounts.add(accountId);
+        }
+
+        this.updatedAt = LocalDateTime.now();
+    }
+
     // ================== GETTERS ==================
     public CustomerId id() { return id; }
+
     public FullName name() { return name; }
+
     public EmailAddress email() { return email; }
+
     public PhoneNo phone() { return phone; }
+
     public Gender gender() { return gender; }
+
     public LocalDate dob() { return dob; }
+
     public CustomerStatus status() { return status; }
+
     public KycStatus kycStatus() { return kycStatus; }
-    public LocalDateTime updatedAt() { return updatedAt; }
+
     public LocalDateTime createdAt() { return createdAt; }
+
+    public LocalDateTime updatedAt() { return updatedAt; }
+
     public KycDocument kycDocument() { return kycDocument; }
 
     public List<AccountId> linkedAccounts() {

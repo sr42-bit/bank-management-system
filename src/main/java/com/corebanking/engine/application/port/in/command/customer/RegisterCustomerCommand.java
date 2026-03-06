@@ -1,4 +1,4 @@
-package com.corebanking.engine.application.port.in.command;
+package com.corebanking.engine.application.port.in.command.customer;
 
 import java.time.LocalDate;
 import com.corebanking.engine.domain.model.enums.Gender;

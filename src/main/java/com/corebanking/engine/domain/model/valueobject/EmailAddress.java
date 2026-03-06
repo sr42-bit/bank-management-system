@@ -11,13 +11,16 @@ public final class EmailAddress {
     private final String value;
 
     private EmailAddress(String value) {
-        if (value == null || value.isBlank())
+
+        if (value == null || value.isBlank()) {
             throw new DomainValidationException("Email cannot be empty");
+        }
 
         String normalized = value.trim().toLowerCase();
 
-        if (!normalized.matches(EMAIL_REGEX))
+        if (!normalized.matches(EMAIL_REGEX)) {
             throw new DomainValidationException("Invalid email format");
+        }
 
         this.value = normalized;
     }

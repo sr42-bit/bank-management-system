@@ -1,41 +1,36 @@
 package com.corebanking.engine.infrastructure.persistence.mapper;
 
-import org.springframework.stereotype.Component;
-
-import com.corebanking.engine.infrastructure.persistence.jpa.entity.AccountJpaEntity;    
 import com.corebanking.engine.domain.model.aggregate.Account;
-import com.corebanking.engine.domain.model.valueobject.AccountId;
-import com.corebanking.engine.domain.model.valueobject.CustomerId;
-import com.corebanking.engine.domain.model.valueobject.AccountNo;
-import com.corebanking.engine.domain.model.valueobject.Balance;
-import  org.springframework.lang.NonNull;
+import com.corebanking.engine.domain.model.enums.AccountStatus;
+import com.corebanking.engine.domain.model.enums.AccountType;
+import com.corebanking.engine.domain.model.valueobject.*;
+import com.corebanking.engine.infrastructure.persistence.jpa.entity.AccountJpaEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AccountEntityMapper {
 
-    public @NonNull AccountJpaEntity toEntity(Account account) {
+    public AccountJpaEntity toEntity(Account account) {
         return new AccountJpaEntity(
-            account.getAccountId().value(),
-            account.getCustomerId().value(),
-            account.getAccountNo().value(),
-            account.getAccountType(),
-            account.getBalance().amount(),   // ✅ FIXED
-            account.getStatus(),
-            account.getCreatedAt(),
-            account.getUpdatedAt()
+                account.accountId().value(),        // primary key
+                account.customerId().value(),
+                account.accountType().name(),
+                account.balance().amount(),
+                account.status().name(),
+                account.createdAt(),
+                account.updatedAt()
         );
     }
 
     public Account toDomain(AccountJpaEntity entity) {
         return Account.rehydrate(
-            AccountId.of(entity.getAccountId()),
-            CustomerId.of(entity.getCustomerId()),
-            AccountNo.of(entity.getAccountNo()),
-            entity.getAccountType(),
-            Balance.of(entity.getBalance()),  // ✅ FIXED
-            entity.getStatus(),
-            entity.getCreatedAt(),
-            entity.getUpdatedAt()
+                AccountId.of(entity.getAccountId()),
+                CustomerId.of(entity.getCustomerId()),
+                AccountType.valueOf(entity.getAccountType()),
+                Balance.of(entity.getBalance()),
+                AccountStatus.valueOf(entity.getStatus()),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 }

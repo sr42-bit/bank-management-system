@@ -1,5 +1,6 @@
 package com.corebanking.engine.infrastructure.persistence.jpa.adapter;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -29,4 +30,11 @@ public class JpaInfoCustomerRepositoryAdapter implements InfoCustomerPort {
         return customerJpaRepository.findById(customerId.value())
                 .map(mapper::toDomain);
     }
+    @Override
+public List<Customer> loadAll() {
+    return customerJpaRepository.findAll()
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
+}
 }

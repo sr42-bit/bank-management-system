@@ -1,8 +1,8 @@
 package com.corebanking.engine.application.service;
 
-import com.corebanking.engine.application.port.in.command.OpenAccountCommand;
+import com.corebanking.engine.application.port.in.command.account.OpenAccountCommand;
 import com.corebanking.engine.application.port.in.result.OpenAccountResult;
-import com.corebanking.engine.application.port.in.usecase.OpenAccountUseCase;
+import com.corebanking.engine.application.port.in.usecase.account.OpenAccountUseCase;
 import com.corebanking.engine.application.port.out.account.AccountIdGenerator;
 import com.corebanking.engine.application.port.out.account.AccountNoGenerator;
 import com.corebanking.engine.application.port.out.account.AccountRepository;

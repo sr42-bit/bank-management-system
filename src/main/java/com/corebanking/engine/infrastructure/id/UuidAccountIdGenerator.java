@@ -11,6 +11,15 @@ public class UuidAccountIdGenerator implements AccountIdGenerator {
 
     @Override
     public AccountId generate() {
-        return AccountId.of(UUID.randomUUID().toString());
+
+        String random = UUID.randomUUID()
+                .toString()
+                .replace("-", "")
+                .substring(0, 16)
+                .toUpperCase();
+
+        String formattedId = "ACC-" + random;
+
+        return AccountId.of(formattedId);
     }
 }

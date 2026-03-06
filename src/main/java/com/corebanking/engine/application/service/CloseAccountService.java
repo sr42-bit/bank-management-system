@@ -1,14 +1,15 @@
 package com.corebanking.engine.application.service;
 
-import com.corebanking.engine.application.port.in.command.CloseAccountCommand;
+import com.corebanking.engine.application.port.in.command.account.CloseAccountCommand;
 import com.corebanking.engine.application.port.in.result.CloseAccountResult;
-import com.corebanking.engine.application.port.in.usecase.CloseAccountUseCase;
+import com.corebanking.engine.application.port.in.usecase.account.CloseAccountUseCase;
 import com.corebanking.engine.application.port.out.account.AccountRepository;
 import com.corebanking.engine.domain.model.aggregate.Account;
 import com.corebanking.engine.domain.model.valueobject.AccountId;
 
-import java.time.Clock;
 import org.springframework.stereotype.Service;
+
+import java.time.Clock;
 
 @Service
 public class CloseAccountService implements CloseAccountUseCase {
@@ -24,22 +25,23 @@ public class CloseAccountService implements CloseAccountUseCase {
     @Override
     public CloseAccountResult close(CloseAccountCommand command) {
 
-        // 1. Load
+        // 1. Convert to ValueObject
         AccountId accountId = AccountId.of(command.accountId());
 
+        // 2. Load
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new IllegalStateException("Account not found"));
 
-        // 2. Domain rule
+        // 3. Domain behavior
         account.close(clock);
 
-        // 3. Persist
+        // 4. Persist
         accountRepository.save(account);
 
-        // 4. Map result
+        // 5. Map result (UPDATED METHODS)
         return CloseAccountResult.success(
-                account.getAccountId().value(),
-                account.getStatus()
+                account.accountId().value(),
+                account.status()
         );
     }
 }

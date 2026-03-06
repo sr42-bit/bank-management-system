@@ -48,7 +48,7 @@ public class CustomerJpaMapper {
 
     public Customer toDomain(CustomerJpaEntity entity) {
         return Customer.rehydrate(
-                CustomerId.of(entity.getId()),
+                CustomerId.of(entity.getCustomerId()),
                 FullName.of(entity.getFirstName(), entity.getLastName()),
                 EmailAddress.of(entity.getEmail()),
                 PhoneNo.of(entity.getPhone()),

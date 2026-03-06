@@ -1,18 +1,19 @@
 package com.corebanking.engine.domain.model.aggregate;
 
-import com.corebanking.engine.domain.model.enums.AccountType;
 import com.corebanking.engine.domain.model.enums.AccountStatus;
+import com.corebanking.engine.domain.model.enums.AccountType;
 import com.corebanking.engine.domain.model.valueobject.*;
+
+import jakarta.transaction.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Account {
+public final class Account {
 
     private final AccountId accountId;
     private final CustomerId customerId;
-    private final AccountNo accountNo;
     private final AccountType accountType;
 
     private Balance balance;
@@ -26,7 +27,6 @@ public class Account {
     private Account(
             AccountId accountId,
             CustomerId customerId,
-            AccountNo accountNo,
             AccountType accountType,
             Balance balance,
             AccountStatus status,
@@ -35,12 +35,11 @@ public class Account {
     ) {
         this.accountId = Objects.requireNonNull(accountId);
         this.customerId = Objects.requireNonNull(customerId);
-        this.accountNo = Objects.requireNonNull(accountNo);
         this.accountType = Objects.requireNonNull(accountType);
         this.balance = Objects.requireNonNull(balance);
         this.status = Objects.requireNonNull(status);
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdAt = Objects.requireNonNull(createdAt);
+        this.updatedAt = Objects.requireNonNull(updatedAt);
     }
 
     /* ================= FACTORY ================= */
@@ -48,22 +47,22 @@ public class Account {
     public static Account open(
             AccountId accountId,
             CustomerId customerId,
-            AccountNo accountNo,
-            AccountType accountType,
+            AccountNo accountNo, AccountType accountType,
             Balance initialBalance,
             Clock clock
     ) {
         Objects.requireNonNull(clock);
 
+        LocalDateTime now = LocalDateTime.now(clock);
+
         return new Account(
                 accountId,
                 customerId,
-                accountNo,
                 accountType,
-                initialBalance,
+                Objects.requireNonNull(initialBalance),
                 AccountStatus.ACTIVE,
-                LocalDateTime.now(clock),
-                LocalDateTime.now(clock)
+                now,
+                now
         );
     }
 
@@ -72,7 +71,6 @@ public class Account {
     public static Account rehydrate(
             AccountId accountId,
             CustomerId customerId,
-            AccountNo accountNo,
             AccountType accountType,
             Balance balance,
             AccountStatus status,
@@ -82,7 +80,6 @@ public class Account {
         return new Account(
                 accountId,
                 customerId,
-                accountNo,
                 accountType,
                 balance,
                 status,
@@ -92,51 +89,76 @@ public class Account {
     }
 
     /* ================= BEHAVIOR ================= */
-
+    @Transactional
     public void deposit(Balance amount, Clock clock) {
         Objects.requireNonNull(amount);
         Objects.requireNonNull(clock);
 
-        if (status != AccountStatus.ACTIVE)
-            throw new IllegalStateException("Account is not active");
+        ensureCreditAllowed();
 
         this.balance = this.balance.add(amount);
-        this.updatedAt = LocalDateTime.now(clock);
+        touch(clock);
     }
 
     public void withdraw(Balance amount, Clock clock) {
         Objects.requireNonNull(amount);
         Objects.requireNonNull(clock);
 
-        if (status != AccountStatus.ACTIVE)
-            throw new IllegalStateException("Account is not active");
+        ensureDebitAllowed();
 
-        if (balance.isLessThan(amount))
-            throw new IllegalStateException("Insufficient balance");
+        Balance newBalance = this.balance.subtract(amount);
 
-        this.balance = this.balance.subtract(amount);
-        this.updatedAt = LocalDateTime.now(clock);
+        if (!accountType.isOverdraftAllowed() && newBalance.isNegative()) {
+            throw new IllegalStateException("Overdraft not allowed for this account type");
+        }
+
+        this.balance = newBalance;
+        touch(clock);
     }
 
     public void close(Clock clock) {
-        if (status == AccountStatus.CLOSED) {
-            throw new IllegalStateException("Account is already closed");
-        }
-        if (!balance.isZero()){
+        Objects.requireNonNull(clock);
+
+        if (!balance.isZero()) {
             throw new IllegalStateException("Balance must be zero to close account");
         }
+
         this.status = AccountStatus.CLOSED;
+        touch(clock);
+    }
+
+    /* ================= STATE GUARDS ================= */
+
+    private void ensureDebitAllowed() {
+        if (status == AccountStatus.CLOSED)
+            throw new IllegalStateException("Account is closed");
+
+        if (status == AccountStatus.SUSPENDED)
+            throw new IllegalStateException("Account is suspended");
+
+        if (status == AccountStatus.FROZEN)
+            throw new IllegalStateException("Account is frozen");
+    }
+
+    private void ensureCreditAllowed() {
+        if (status == AccountStatus.CLOSED)
+            throw new IllegalStateException("Account is closed");
+
+        if (status == AccountStatus.SUSPENDED)
+            throw new IllegalStateException("Account is suspended");
+    }
+
+    private void touch(Clock clock) {
         this.updatedAt = LocalDateTime.now(clock);
     }
-    
+
     /* ================= GETTERS ================= */
 
-    public AccountId getAccountId() { return accountId; }
-    public CustomerId getCustomerId() { return customerId; }
-    public AccountNo getAccountNo() { return accountNo; }
-    public AccountType getAccountType() { return accountType; }
-    public Balance getBalance() { return balance; }
-    public AccountStatus getStatus() { return status; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public AccountId accountId() { return accountId; }
+    public CustomerId customerId() { return customerId; }
+    public AccountType accountType() { return accountType; }
+    public Balance balance() { return balance; }
+    public AccountStatus status() { return status; }
+    public LocalDateTime createdAt() { return createdAt; }
+    public LocalDateTime updatedAt() { return updatedAt; }
 }

@@ -8,4 +8,9 @@ import java.util.Optional;
 public interface AccountRepository {
     void save(Account account);
     Optional<Account> findById(AccountId accountId);
+    long countAccounts();
+
+long countAccountsByStatus(String status);
+
+java.math.BigDecimal sumTotalBalance();
 }
