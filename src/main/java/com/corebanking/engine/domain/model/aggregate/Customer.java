@@ -151,7 +151,11 @@ public final class Customer {
 
         this.updatedAt = LocalDateTime.now();
     }
-
+    // ================== DEACTIVATE ==================
+    public void deactivate(java.time.Clock clock) {
+        this.status = CustomerStatus.INACTIVE;
+        this.updatedAt = java.time.LocalDateTime.now(clock);
+    }
     // ================== GETTERS ==================
     public CustomerId id() { return id; }
 

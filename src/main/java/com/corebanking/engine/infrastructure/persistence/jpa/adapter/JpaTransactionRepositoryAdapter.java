@@ -2,7 +2,7 @@ package com.corebanking.engine.infrastructure.persistence.jpa.adapter;
 
 import com.corebanking.engine.application.port.out.money.TransactionRepository;
 import com.corebanking.engine.domain.model.aggregate.Transaction;
-import com.corebanking.engine.domain.model.enums.TransactionType;
+import com.corebanking.engine.domain.model.enums.TransactionStatus;
 import com.corebanking.engine.domain.model.valueobject.AccountId;
 import com.corebanking.engine.domain.model.valueobject.Balance;
 import com.corebanking.engine.infrastructure.persistence.jpa.entity.TransactionJpaEntity;
@@ -26,18 +26,27 @@ public class JpaTransactionRepositoryAdapter implements TransactionRepository {
         TransactionJpaEntity entity = new TransactionJpaEntity();
 
         entity.setTransactionId(transaction.transactionId());
+
         entity.setFromAccountId(
                 transaction.fromAccount() != null
                         ? transaction.fromAccount().value()
                         : null
         );
+
         entity.setToAccountId(
                 transaction.toAccount() != null
                         ? transaction.toAccount().value()
                         : null
         );
+
         entity.setAmount(transaction.amount().value());
-        entity.setType(transaction.type().name());
+
+        // ✅ FIX: direct enum (NO String)
+        entity.setType(transaction.type());
+
+        // ✅ FIX: REQUIRED FIELD (DB NOT NULL)
+        entity.setStatus(TransactionStatus.SUCCESS);
+
         entity.setCreatedAt(transaction.createdAt());
 
         repository.save(entity);
@@ -57,11 +66,15 @@ public class JpaTransactionRepositoryAdapter implements TransactionRepository {
                         entity.getFromAccountId() != null
                                 ? AccountId.of(entity.getFromAccountId())
                                 : null,
+
                         entity.getToAccountId() != null
                                 ? AccountId.of(entity.getToAccountId())
                                 : null,
+
                         Balance.of(entity.getAmount()),
-                        TransactionType.valueOf(entity.getType())
+
+                        // ✅ FIX: already enum, NO valueOf
+                        entity.getType()
                 ))
                 .toList();
     }

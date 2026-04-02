@@ -1,7 +1,7 @@
 package com.corebanking.engine.application.port.in.usecase.customer;
 
 import com.corebanking.engine.application.port.in.command.customer.InfoCustomerCommand;
-import com.corebanking.engine.application.port.in.result.InfoCustomerResult;
+import com.corebanking.engine.application.port.in.result.customer.InfoCustomerResult;
 
 import java.util.List;
 
