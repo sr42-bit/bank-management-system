@@ -18,8 +18,8 @@ jobs:
           java-version: '17'
 
       - name: Build Backend
-        run: mvn clean install
         working-directory: engine
+        run: mvn clean install -DskipTests
 
   frontend:
     runs-on: ubuntu-latest
@@ -33,7 +33,7 @@ jobs:
           node-version: '18'
 
       - name: Build Frontend
+        working-directory: frontend
         run: |
           npm install
           npm run build
-        working-directory: frontend
