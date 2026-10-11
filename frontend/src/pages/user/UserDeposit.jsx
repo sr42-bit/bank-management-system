@@ -32,7 +32,7 @@ function UserDeposit() {
   };
 
   const handleDeposit = async () => {
-    if (!selectedAccount || !amount) {
+    if (!selectedAccount || !amount || !Number.isFinite(Number(amount)) || Number(amount) <= 0) {
       alert("Fill all fields");
       return;
     }
