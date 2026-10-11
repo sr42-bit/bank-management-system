@@ -41,7 +41,7 @@ public WithdrawMoneyResult withdraw(WithdrawMoneyCommand command) {
             .findById(AccountId.of(command.accountId()))
             .orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
-    Balance amount = Balance.of(command.amount());
+    Balance amount = Balance.positiveAmount(command.amount());
 
     account.withdraw(amount, clock);
 
