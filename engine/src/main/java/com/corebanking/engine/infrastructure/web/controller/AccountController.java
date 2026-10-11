@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.corebanking.engine.application.port.in.usecase.account.CloseAccountUseCase;
@@ -103,7 +104,7 @@ public class AccountController {
     @PutMapping("/{accountId}/deposit")
     public ResponseEntity<DepositMoneyResponse> deposit(
             @PathVariable String accountId,
-            @RequestBody DepositMoneyRequest request) {
+            @Valid @RequestBody DepositMoneyRequest request) {
 
         DepositMoneyCommand command =
                 new DepositMoneyCommand(accountId, request.amount());
@@ -122,7 +123,7 @@ public class AccountController {
     @PutMapping("/{accountId}/withdraw")
     public ResponseEntity<DepositMoneyResponse> withdraw(
             @PathVariable String accountId,
-            @RequestBody WithdrawMoneyRequest request) {
+            @Valid @RequestBody WithdrawMoneyRequest request) {
 
         WithdrawMoneyCommand command =
                 new WithdrawMoneyCommand(accountId, request.amount());
@@ -140,7 +141,7 @@ public class AccountController {
     // ================= TRANSFER =================
     @PutMapping("/transfer")
     public ResponseEntity<TransferMoneyResponse> transfer(
-            @RequestBody TransferMoneyRequest request) {
+            @Valid @RequestBody TransferMoneyRequest request) {
 
         TransferMoneyCommand command =
                 new TransferMoneyCommand(
@@ -177,8 +178,6 @@ public class AccountController {
 
         // ✅ Extract correct identity
         String customerId = jwtUtil.extractCustomerId(token);
-
-        System.out.println("CustomerId in AccountController: " + customerId);
 
         List<AccountJpaEntity> accounts =
                 dashboardService.getAccountsByCustomerId(customerId);
