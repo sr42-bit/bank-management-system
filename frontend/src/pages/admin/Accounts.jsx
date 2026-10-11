@@ -60,7 +60,7 @@ function Accounts() {
 
       alert("Deposit successful ✅");
       loadAccounts();
-    } catch (err) {
+    } catch {
       alert("Deposit failed ❌");
     }
   };
@@ -76,7 +76,7 @@ function Accounts() {
 
       alert("Withdraw successful ✅");
       loadAccounts();
-    } catch (err) {
+    } catch {
       alert("Withdraw failed ❌");
     }
   };
@@ -89,7 +89,7 @@ function Accounts() {
 
       alert("Account closed ✅");
       loadAccounts();
-    } catch (err) {
+    } catch {
       alert("Close failed (balance must be zero) ❌");
     }
   };
