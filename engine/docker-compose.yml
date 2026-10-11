@@ -2,14 +2,14 @@ services:
   mysql:
     image: mysql:8.0
     container_name: corebank-mysql
-    restart: always
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
       MYSQL_DATABASE: bank_clean_architecture
-      MYSQL_USER: bankuser
-      MYSQL_PASSWORD: bankpass
+      MYSQL_USER: ${DB_USERNAME:-bankuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
     ports:
-      - "3307:3306"
+      - "127.0.0.1:3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -20,9 +20,16 @@ services:
     container_name: corebank-backend
     depends_on:
       - mysql
-    restart: always
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/bank_clean_architecture?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: ${DB_USERNAME:-bankuser}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     networks:
       - corebank-net
 
