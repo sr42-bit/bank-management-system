@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import API from "../../services/api/api";
 import { useNavigate } from "react-router-dom";
 
@@ -20,18 +20,27 @@ function Customers() {
   const [form, setForm] = useState(EMPTY_FORM);
 
   // ================= LOAD =================
-  const loadCustomers = useCallback(async () => {
-    try {
-      const res = await API.get("/customers");
-      setCustomers(res.data.data || []);
-    } catch (err) {
-      console.error("Load error:", err);
-    }
-  }, []);
-
   useEffect(() => {
-    loadCustomers();
-  }, [loadCustomers]);
+    let cancelled = false;
+
+    const fetchCustomers = async () => {
+      try {
+        const res = await API.get("/customers");
+        if (!cancelled) {
+          setCustomers(res.data.data || []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error("Load error:", err);
+        }
+      }
+    };
+
+    void fetchCustomers();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // ================= FORM =================
   const handleChange = (e) => {
