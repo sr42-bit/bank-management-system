@@ -3,14 +3,12 @@ package com.corebanking.engine.infrastructure.security;
 import com.corebanking.engine.infrastructure.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -18,45 +16,36 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // ✅ MAIN SECURITY CONFIG
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> {})
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                .requestMatchers("/api/auth/create-admin", "/api/auth/create-employee").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/transactions/**", "/api/customers/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/user/**").hasAuthority("ROLE_USER")
+                .requestMatchers("/api/dashboard/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_EMPLOYEE")
+                .requestMatchers("/api/accounts/account-growth").hasAnyAuthority("ROLE_ADMIN", "ROLE_EMPLOYEE")
+                .requestMatchers(HttpMethod.GET, "/api/accounts").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_EMPLOYEE")
+                .requestMatchers("/api/accounts/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_EMPLOYEE")
+                .anyRequest().denyAll()
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
 
-    http
-        .csrf(csrf -> csrf.disable())
-
-        // ✅ FIXED CORS
-        .cors(cors -> {})
-
-        .formLogin(form -> form.disable())
-        .httpBasic(basic -> basic.disable())
-
-        .sessionManagement(session ->
-            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        )
-
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-            .requestMatchers("/api/user/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-            .requestMatchers("/api/dashboard/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-            .anyRequest().authenticated()
-        )
-
-        .addFilterBefore(jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class);
-
-    return http.build();
-}
-
-    // ✅ DISABLE DEFAULT SPRING USER (CRITICAL FIX)
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
@@ -64,7 +53,6 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         };
     }
 
-    // ✅ REQUIRED FOR AUTH MANAGER (CLEAN SETUP)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

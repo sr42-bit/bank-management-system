@@ -36,6 +36,11 @@ public TransferMoneyService(AccountRepository accountRepository,
 @Override
 public TransferMoneyResult transfer(TransferMoneyCommand command) {
 
+    if (command.fromAccountId() == null || command.toAccountId() == null
+            || command.fromAccountId().equals(command.toAccountId())) {
+        throw new IllegalArgumentException("Source and destination accounts must be different");
+    }
+
     // Find source account
     Account fromAccount = accountRepository
             .findById(AccountId.of(command.fromAccountId()))
@@ -47,7 +52,7 @@ public TransferMoneyResult transfer(TransferMoneyCommand command) {
             .orElseThrow(() -> new IllegalArgumentException("Destination account not found"));
 
     // Convert amount
-    Balance amount = Balance.of(command.amount());
+    Balance amount = Balance.positiveAmount(command.amount());
 
     // Perform transfer
     fromAccount.withdraw(amount, clock);

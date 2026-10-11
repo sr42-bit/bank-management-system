@@ -9,3 +9,12 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+
+security:
+  jwt:
+    secret: test-only-jwt-secret-key-that-is-at-least-32-bytes
+
+app:
+  bootstrap-admin:
+    email:
+    password:

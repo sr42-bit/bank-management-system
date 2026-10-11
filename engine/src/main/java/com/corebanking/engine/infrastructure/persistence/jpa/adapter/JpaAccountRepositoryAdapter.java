@@ -29,11 +29,10 @@ public class JpaAccountRepositoryAdapter implements AccountRepository {
     @Override
     public void save(Account account) {
 
-        AccountJpaEntity entity = mapper.toEntity(account);
-
-        if (entity != null) {
-            jpaAccountRepository.save(entity);
-        }
+        AccountJpaEntity entity = jpaAccountRepository.findById(account.accountId().value())
+                .map(existing -> mapper.updateEntity(account, existing))
+                .orElseGet(() -> mapper.toEntity(account));
+        jpaAccountRepository.save(entity);
     }
 
     @Override

@@ -22,6 +22,18 @@ public class AccountEntityMapper {
         );
     }
 
+    public AccountJpaEntity updateEntity(Account account, AccountJpaEntity entity) {
+        entity.updateFromDomain(
+                account.customerId().value(),
+                account.accountType().name(),
+                account.balance().amount(),
+                account.status().name(),
+                account.createdAt(),
+                account.updatedAt()
+        );
+        return entity;
+    }
+
     public Account toDomain(AccountJpaEntity entity) {
         return Account.rehydrate(
                 AccountId.of(entity.getAccountId()),

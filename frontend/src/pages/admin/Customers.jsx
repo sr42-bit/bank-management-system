@@ -30,7 +30,9 @@ function Customers() {
   }, []);
 
   useEffect(() => {
-    loadCustomers();
+    // This async fetch updates component state after the HTTP request resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadCustomers();
   }, [loadCustomers]);
 
   // ================= FORM =================

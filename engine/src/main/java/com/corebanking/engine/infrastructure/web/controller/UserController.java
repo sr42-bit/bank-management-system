@@ -63,6 +63,15 @@ public class UserController {
         return customerId;
     }
 
+    private void ensureOwnsAccount(String customerId, String accountId) {
+        boolean owned = accountRepository.findByCustomerId(customerId).stream()
+                .anyMatch(account -> account.getAccountId().equals(accountId));
+        if (!owned) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "Account access denied");
+        }
+    }
+
     // ================= ACCOUNTS =================
     @GetMapping("/accounts")
     public ResponseEntity<List<AccountJpaEntity>> getUserAccounts(Authentication authentication) {
@@ -78,16 +87,20 @@ public class UserController {
     // ================= DEPOSIT =================
     @PostMapping("/deposit")
     public ResponseEntity<DepositMoneyResult> deposit(
-            @RequestBody DepositMoneyCommand command
+            @RequestBody DepositMoneyCommand command,
+            Authentication authentication
     ) {
+        ensureOwnsAccount(getCustomerId(authentication), command.accountId());
         return ResponseEntity.ok(depositMoneyUseCase.deposit(command));
     }
 
     // ================= WITHDRAW =================
     @PostMapping("/withdraw")
     public ResponseEntity<WithdrawMoneyResult> withdraw(
-            @RequestBody WithdrawMoneyCommand command
+            @RequestBody WithdrawMoneyCommand command,
+            Authentication authentication
     ) {
+        ensureOwnsAccount(getCustomerId(authentication), command.accountId());
         return ResponseEntity.ok(withdrawMoneyUseCase.withdraw(command));
     }
 

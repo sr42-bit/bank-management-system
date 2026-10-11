@@ -12,6 +12,10 @@ public class AccountJpaEntity {
     @Column(name = "account_id")
     private String accountId;   // Primary Key + Business Identifier
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
+
     @Column(name = "customer_id", nullable = false)
     private String customerId;
 
@@ -42,6 +46,16 @@ public class AccountJpaEntity {
             LocalDateTime updatedAt
     ) {
         this.accountId = accountId;
+        this.customerId = customerId;
+        this.accountType = accountType;
+        this.balance = balance;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public void updateFromDomain(String customerId, String accountType, BigDecimal balance,
+                                 String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.customerId = customerId;
         this.accountType = accountType;
         this.balance = balance;
