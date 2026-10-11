@@ -41,7 +41,7 @@ public class AuthController {
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
+                    Map.of("message", "Request could not be processed")
             );
         }
     }
@@ -69,7 +69,7 @@ public class AuthController {
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
+                    Map.of("message", "Request could not be processed")
             );
         }
     }
@@ -90,7 +90,7 @@ public class AuthController {
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
+                    Map.of("message", "Request could not be processed")
             );
         }
     }
@@ -111,7 +111,7 @@ public class AuthController {
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                    Map.of("message", e.getMessage())
+                    Map.of("message", "Request could not be processed")
             );
         }
     }
