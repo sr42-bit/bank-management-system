@@ -20,27 +20,20 @@ function Customers() {
   const [form, setForm] = useState(EMPTY_FORM);
 
   // ================= LOAD =================
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchCustomers = async () => {
-      try {
-        const res = await API.get("/customers");
-        if (!cancelled) {
-          setCustomers(res.data.data || []);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.error("Load error:", err);
-        }
-      }
-    };
-
-    void fetchCustomers();
-    return () => {
-      cancelled = true;
-    };
+  const loadCustomers = useCallback(async () => {
+    try {
+      const res = await API.get("/customers");
+      setCustomers(res.data.data || []);
+    } catch (err) {
+      console.error("Load error:", err);
+    }
   }, []);
+
+  useEffect(() => {
+    // This async fetch updates component state after the HTTP request resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadCustomers();
+  }, [loadCustomers]);
 
   // ================= FORM =================
   const handleChange = (e) => {
